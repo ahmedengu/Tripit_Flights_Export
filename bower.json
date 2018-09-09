@@ -1,0 +1,34 @@
+{
+  "name": "tripitflightsexport",
+  "version": "0.0.0",
+  "authors": [],
+  "license": "none",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "json3": "latest",
+    "es5-shim": "latest",
+    "animate.css-scss": "latest",
+    "angular": "^1.6.6",
+    "angular-animate": "^1.6.6",
+    "angular-aria": "^1.6.6",
+    "angular-cookies": "^1.6.6",
+    "angular-resource": "^1.6.6",
+    "angular-sanitize": "^1.6.6",
+    "angular-ui-router": "latest",
+    "angular-material": "latest",
+    "ng-fab-form": "latest"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.6.6"
+  },
+  "scripts": {
+    "postinstall": "gulp wiredep"
+  }
+}
