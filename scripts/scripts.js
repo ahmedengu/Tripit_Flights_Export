@@ -124,7 +124,7 @@
 
 
             $scope.getToken = function () {
-                var newurl = location.origin + '#!/?client_key=' + $scope.client_key + "&client_secret=" + $scope.client_secret;
+                var newurl = location.origin + location.pathname + '#!/?client_key=' + $scope.client_key + "&client_secret=" + $scope.client_secret;
                 window.history.pushState({path: newurl}, '', newurl);
 
                 let nonceObj = new jsSHA(Math.round((new Date()).getTime() / 1000.0), "TEXT");
