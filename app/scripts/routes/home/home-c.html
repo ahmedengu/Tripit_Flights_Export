@@ -1,6 +1,6 @@
 <div class="page-home">
     <md-content class="md-padding" layout-xs="column" layout="row" layout-align="center center">
-        <md-card flex-xs flex-gt-xs="50" layout="column">
+        <md-card flex-xs flex-gt-xs="60" layout="column">
             <md-card-title>
                 <md-card-title-text>
                     <span class="md-headline">Auth Data</span>
@@ -24,7 +24,7 @@
                 </div>
 
             </md-card-content>
-            <div layout-gt-xs="row">
+            <div layout-gt-xs="row" ng-if="oauth_token&&oauth_token_secret">
                 <md-input-container class="md-block" flex-gt-xs>
                     <label>oauth_token</label>
                     <input ng-model="oauth_token" disabled>

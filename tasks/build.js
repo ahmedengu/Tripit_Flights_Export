@@ -32,8 +32,8 @@ gulp.task('build', function(callback) {
         'cleanDist',
         'wiredepBuild',
         'injectAll',
-        'testSingle',
-        'lint',
+        // 'testSingle',
+        // 'lint',
         'sass',
         'minFiles',
         'copy',
@@ -88,11 +88,6 @@ gulp.task('minFiles', function() {
         .pipe(useref({}, lazypipe()
             .pipe(sourcemaps.init, {loadMaps: true})))
         .pipe(gulpif('*.js', ngAnnotate()))
-        .pipe(gulpif(/\.js$/, uglify({
-          output: {
-            comments: saveLicense
-          }
-        })))
         .pipe(gulpif('*.css', cleanCSS()))
         .pipe(gulp.dest(config.dist));
 });
