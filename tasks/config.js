@@ -28,6 +28,7 @@ module.exports = (function() {
         scripts: base + '/scripts/',
         scriptsF: [
             // modules first
+            base + '/bower_components/oauth-signature/dist/oauth-signature.js',
             base + '/scripts/**/_*.js',
             base + '/scripts/**/*.js',
             '!' + base + '/scripts/**/*.spec.js'
