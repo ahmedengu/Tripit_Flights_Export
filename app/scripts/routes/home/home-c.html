@@ -20,7 +20,7 @@
                 </div>
 
                 <div layout-gt-xs="row" layout-align="center center">
-                    <md-button class="md-raised md-primary" ng-click="getToken()">Get Token</md-button>
+                    <md-button class="md-raised md-primary" ng-click="getToken()" ng-disabled="loading">Get Token</md-button>
                 </div>
 
             </md-card-content>
@@ -35,6 +35,17 @@
                     <input ng-model="oauth_token_secret" disabled>
                 </md-input-container>
             </div>
+        </md-card>
+    </md-content>
+    <md-content class="md-padding" layout-xs="column" layout="row" layout-align="center center" ng-if="listTripTraveler">
+        <md-card flex-xs flex-gt-xs="60" layout="column">
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">list/trip/traveler</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                {{listTripTraveler}}
             </md-card-content>
         </md-card>
     </md-content>

@@ -11,7 +11,7 @@
 
     class HomeCtrl {
         /* @ngInject */
-        constructor($scope, $http) {
+        constructor($scope, $http, $location, $mdDialog) {
             function form2Json(str) {
                 "use strict";
                 var obj, i, pt, keys, j, ev;
@@ -51,6 +51,66 @@
                 return obj;
             }
 
+            function getAuthString($scope, httpMethod, url, requestToken) {
+                if (requestToken) {
+                    let parameters = {
+                        oauth_consumer_key: $scope.client_key,
+                        oauth_nonce: Math.round((new Date()).getTime() / 1000.0) + Math.random().toString(36).substring(10),
+                        oauth_timestamp: Math.round((new Date()).getTime() / 1000.0),
+                        oauth_signature_method: 'HMAC-SHA1',
+                        oauth_version: '1.0',
+                    };
+                    let consumerSecret = $scope.client_secret;
+                    var oauth_signature = oauthSignature.generate(
+                        httpMethod,
+                        url,
+                        parameters,
+                        consumerSecret);
+
+
+                    return {
+                        'Authorization': "OAuth "
+                        + 'oauth_consumer_key="' + parameters.oauth_consumer_key + '",'
+                        + 'oauth_signature_method="' + parameters.oauth_signature_method + '",'
+                        + 'oauth_timestamp="' + parameters.oauth_timestamp + '",'
+                        + 'oauth_nonce="' + parameters.oauth_nonce + '",'
+                        + 'oauth_version="' + parameters.oauth_version + '",'
+                        + 'oauth_signature="' + oauth_signature + '"',
+                        "origin": location.origin
+                    }
+                } else {
+                    let parameters = {
+                        oauth_consumer_key: $scope.client_key,
+                        oauth_token: $scope.oauth_token,
+                        oauth_nonce: Math.round((new Date()).getTime() / 1000.0) + Math.random().toString(36).substring(10),
+                        oauth_timestamp: Math.round((new Date()).getTime() / 1000.0),
+                        oauth_signature_method: 'HMAC-SHA1',
+                        oauth_version: '1.0',
+                    };
+                    let consumerSecret = $scope.client_secret;
+                    let tokenSecret = $scope.oauth_token_secret;
+                    var oauth_signature = oauthSignature.generate(
+                        httpMethod,
+                        url,
+                        parameters,
+                        consumerSecret,
+                        tokenSecret);
+
+
+                    return {
+                        'Authorization': "OAuth "
+                        + 'oauth_consumer_key="' + parameters.oauth_consumer_key + '",'
+                        + 'oauth_token="' + parameters.oauth_token + '",'
+                        + 'oauth_signature_method="' + parameters.oauth_signature_method + '",'
+                        + 'oauth_timestamp="' + parameters.oauth_timestamp + '",'
+                        + 'oauth_nonce="' + parameters.oauth_nonce + '",'
+                        + 'oauth_version="' + parameters.oauth_version + '",'
+                        + 'oauth_signature="' + oauth_signature + '"',
+                        "origin": location.origin
+                    }
+                }
+            }
+
             function getParameterByName(name, url) {
                 if (!url) url = window.location.href;
                 name = name.replace(/[\[\]]/g, '\\$&');
@@ -61,51 +121,99 @@
                 return decodeURIComponent(results[2].replace(/\+/g, ' '));
             }
 
+            function queryList() {
+                let httpMethod = 'GET';
+                let url = 'https://api.tripit.com/v1/list/trip/traveler/true/past/true/format/json/page_size/500/include_objects/true';
+
+                $http({
+                    method: httpMethod,
+                    url: "https://cors-anywhere.herokuapp.com/" + url,
+                    withCredentials: false,
+                    headers: getAuthString($scope, httpMethod, url, false),
+                }).then(function (response) {
+                    $scope.listTripTraveler = response.data
+                }).catch(function (reason) {
+                    console.log(reason);
+                    if (reason.data.Error.description) {
+                        $mdDialog.show(
+                            $mdDialog.alert()
+                                .clickOutsideToClose(true)
+                                .title('Error')
+                                .textContent(reason.data.Error.description)
+                                .ok('Got it!')
+                        );
+                    }
+                });
+            }
+
             $scope.client_key = getParameterByName('client_key');
             $scope.client_secret = getParameterByName('client_secret');
             $scope.oauth_token = getParameterByName('oauth_token');
             $scope.oauth_token_secret = getParameterByName('oauth_token_secret');
 
 
-            $scope.getToken = function () {
-                var newurl = location.origin + location.pathname + '#!/?client_key=' + $scope.client_key + "&client_secret=" + $scope.client_secret;
-                window.history.pushState({path: newurl}, '', newurl);
+            if ($scope.oauth_token) {
+                if (getParameterByName('request_token')) {
+                    let httpMethod = 'POST';
+                    let url = 'https://api.tripit.com/oauth/access_token';
 
-                let nonceObj = new jsSHA(Math.round((new Date()).getTime() / 1000.0), "TEXT");
-                let endpoint = "https://api.tripit.com/oauth/request_token";
-                let requiredParameters = {
-                    oauth_consumer_key: $scope.client_key,
-                    oauth_nonce: nonceObj.getHash("SHA-1", "HEX"),
-                    oauth_signature_method: "HMAC-SHA1",
-                    oauth_timestamp: Math.round((new Date()).getTime() / 1000.0),
-                    oauth_version: "1.0"
-                };
+                    $http({
+                        method: httpMethod,
+                        url: "https://cors-anywhere.herokuapp.com/" + url,
+                        withCredentials: false,
+                        headers: getAuthString($scope, httpMethod, url, false),
+                    }).then(function (response) {
+                        $scope.oauth_token = form2Json(response.data)['oauth_token'];
+                        $scope.oauth_token_secret = form2Json(response.data)['oauth_token_secret'];
+                        $location
+                            .search({
+                                'oauth_token': $scope.oauth_token,
+                                'oauth_token_secret': $scope.oauth_token_secret,
+                                'client_key': $scope.client_key,
+                                'client_secret': $scope.client_secret,
+                            });
 
-                let base_signature_string = "POST&" + encodeURIComponent(endpoint) + "&";
-                var requiredParameterKeys = Object.keys(requiredParameters);
-                for (var i = 0; i < requiredParameterKeys.length; i++) {
-                    if (i == requiredParameterKeys.length - 1) {
-                        base_signature_string += encodeURIComponent(requiredParameterKeys[i] + "=" + requiredParameters[requiredParameterKeys[i]]);
-                    } else {
-                        base_signature_string += encodeURIComponent(requiredParameterKeys[i] + "=" + requiredParameters[requiredParameterKeys[i]] + "&");
-                    }
+                        queryList();
+                    }).catch(function (reason) {
+                        console.log(reason);
+                        if (reason.data.Error.description) {
+                            $mdDialog.show(
+                                $mdDialog.alert()
+                                    .clickOutsideToClose(true)
+                                    .title('Error')
+                                    .textContent(reason.data.Error.description)
+                                    .ok('Got it!')
+                            );
+                        }
+                    });
+                } else {
+                    queryList();
                 }
+            } else {
+                $scope.loading = false;
+            }
+            $scope.getToken = function () {
+                $scope.loading = true;
 
-                let shaObj = new jsSHA(base_signature_string, "TEXT");
-                let hmac_sha1 = encodeURIComponent(shaObj.getHMAC($scope.client_secret + "&", "TEXT", "SHA-1", "B64"));
-
-                let headers = {
-                    "Authorization": 'OAuth oauth_consumer_key="' + requiredParameters.oauth_consumer_key + '",oauth_timestamp="' + requiredParameters.oauth_timestamp + '",oauth_signature_method="HMAC-SHA1",oauth_nonce="' + requiredParameters.oauth_nonce + '",oauth_version="1.0",oauth_signature="' + hmac_sha1 + '"'
-                };
-                console.log(headers);
-
+                let url = "https://api.tripit.com/oauth/request_token";
                 $http({
                     method: "POST",
-                    url: "https://cors-anywhere.herokuapp.com/" + endpoint,
+                    url: "https://cors-anywhere.herokuapp.com/" + url,
                     withCredentials: false,
-                    headers: headers
+                    headers: getAuthString($scope, "POST", url, true),
                 }).then(function (response) {
-                    location.href = "https://www.tripit.com/oauth/authorize?" + response.data + "&oauth_callback=" + encodeURIComponent(location.href + "&oauth_token_secret=" + form2Json(response.data)['oauth_token_secret']);
+                    $location
+                        .search({
+                            'oauth_token': form2Json(response.data)['oauth_token'],
+                            'oauth_token_secret': form2Json(response.data)['oauth_token_secret'],
+                            'client_key': $scope.client_key,
+                            'client_secret': $scope.client_secret,
+                            'request_token': 1,
+                        });
+                    setTimeout(function () {
+                        location.href = "https://www.tripit.com/oauth/authorize?" + response.data + "&oauth_callback=" + encodeURIComponent(location.href);
+                    }, 1000);
+                    $scope.loading = false;
                 });
             }
         }
