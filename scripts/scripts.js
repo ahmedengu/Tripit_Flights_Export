@@ -511,6 +511,7 @@ e;d++)if(d%4){var g=f.indexOf(b.charAt(d-1))<<2*(d%4),h=f.indexOf(b.charAt(d))>>
                     withCredentials: false,
                     headers: getAuthString($scope, httpMethod, url, false),
                 }).then(function (response) {
+                    console.log(response);
                     $scope.listTripTraveler = response.data
                 }).catch(function (reason) {
                     console.log(reason);
