@@ -1,0 +1,64 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <title>Tripit flights export</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="description"
+          content="">
+    <meta name="keywords"
+          content="">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/green/pace-theme-flash.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js"></script>
+
+    <!-- Enable all requests and inline styles for painless development.
+TODO configure more restrictive Content-Security-Policy
+@see http://content-security-policy.com/
+@see http://www.html5rocks.com/en/tutorials/security/content-security-policy/ -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src *;
+          img-src * data:;
+          style-src * 'unsafe-inline';
+          script-src * 'unsafe-inline'">
+
+    <link rel="stylesheet" href="styles/vendor.css">
+
+    
+</head>
+
+<body ng-app="tripitflightsexport">
+
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+        <h2 flex md-truncate>Tripit Flights Export</h2>
+    </div>
+</md-toolbar>
+
+<a href="https://github.com/ahmedengu/Tripit_Flights_Export"><img style="z-index: 999;position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+
+<main ui-view></main>
+
+
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<script src="/bower_components/oauth-signature/dist/oauth-signature.js"></script>
+
+<!--[if lt IE 9]>
+<script src="scripts/oldieshim.js"></script>
+<![endif]-->
+
+<script src="scripts/vendor.js" defer></script>
+
+<script src="scripts/scripts.js" defer></script>
+</body>
+</html>
+
+
